@@ -15,7 +15,8 @@ unsigned char read_0_1() {
     if (cin.fail()) {
       cin.clear();
       cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-      cout << "Ошибка ввода данных.\n";
+      cout << "Ошибка ввода данных.\nПовторите ввод:";
+      continue;
     }
     if (enter == "0" || enter == "1") {
       return enter[0];
@@ -24,7 +25,6 @@ unsigned char read_0_1() {
     }
   }
 }
-
 unsigned read_uint(string data) {
   unsigned num;
   string enter;
@@ -65,9 +65,8 @@ int *read_arr(unsigned n, string data) {
   string buf = "";
   string enter;
   bool seqense = true;
-  int *arr = new int[n];
-  int *zero = new int[1];
-  zero[0] = 0;
+  int *arr = new int[n + 1];
+  arr[0] = 1;
   unsigned iter = 0;
   while (true) {
     if (data == "") {
@@ -80,22 +79,27 @@ int *read_arr(unsigned n, string data) {
         if (buf == "") {
           buf += enter[i];
         } else {
-          cout << "Ошибка в веденных данных: " << enter[i] << '(' << i << ")\n";
+          cout << "Недопустимый символ: " << enter[i] << '(' << i << ")\n";
           seqense = false;
         }
       } else if (isdigit(enter[i])) {
         if (buf != "0") {
           buf += enter[i];
         } else {
-          cout << "Ошибка в веденных данных: " << enter[i] << '(' << i << ")\n";
+          cout << "Недопустимый символ: " << enter[i] << '(' << i << ")\n";
           seqense = false;
         }
       } else if (enter[i] == ',' || enter[i] == '\n') {
-        arr[iter] = atoi(buf.c_str());
         iter++;
+        if (iter > n) {
+          enter = "";
+          buf = "";
+          break;
+        }
+        arr[iter + 1] = atoi(buf.c_str());
         buf = "";
       } else {
-        cout << "Ошибка в веденных данных: " << enter[i] << '(' << i << ")\n";
+        cout << "Недопустимый символ: " << enter[i] << '(' << i << ")\n";
         seqense = false;
       }
       if (!seqense) {
@@ -103,9 +107,10 @@ int *read_arr(unsigned n, string data) {
         buf = "";
         break;
       }
-      if (iter > n) {
+      if (iter > n + 1) {
         enter = "";
         buf = "";
+        seqense = false;
         break;
       }
     }
@@ -116,27 +121,33 @@ int *read_arr(unsigned n, string data) {
       seqense = true;
       iter = 0;
       if (data != "") {
-        return zero;
+        arr[0] = -1;
+        return arr;
       }
       continue;
     }
     if (buf != "") {
-      arr[iter] = atoi(buf.c_str());
       iter++;
+      if (iter > n) {
+        enter = "";
+        buf = "";
+        break;
+      }
+      arr[iter + 1] = atoi(buf.c_str());
     }
-
     if (iter == n) {
       return arr;
     } else {
-      cout
-          << "Введенное кол-во данных не соответствует введенному значению n\n";
+      cout << "Введенное кол-во данных не соответствует " << n << "\n";
       if (data == "") {
         cout << "Повторите ввод данных: ";
       }
       iter = 0;
     }
     if (data != "") {
-      return zero;
+      arr[0] = -1;
+      return arr;
     }
   }
+  return arr;
 }
